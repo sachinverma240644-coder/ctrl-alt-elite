@@ -1,4 +1,3 @@
-
 import { AdminTicketAutoPrioritizationOutput } from '@/ai/flows/admin-ticket-auto-prioritization';
 
 export type TicketStatus = 'Pending' | 'In Progress' | 'Resolved';
@@ -27,6 +26,8 @@ export interface LostAndFoundItem {
 
 export interface RentPayment {
   id: string;
+  studentName: string;
+  roomNumber: string;
   month: string;
   amount: number;
   status: 'Paid' | 'Pending' | 'Overdue';
@@ -65,6 +66,8 @@ let lostItems: LostAndFoundItem[] = [
 let rentPayments: RentPayment[] = [
   {
     id: 'R-1',
+    studentName: 'Alex Johnson',
+    roomNumber: '101',
     month: 'October 2023',
     amount: 500,
     status: 'Paid',
@@ -73,10 +76,31 @@ let rentPayments: RentPayment[] = [
   },
   {
     id: 'R-2',
+    studentName: 'Alex Johnson',
+    roomNumber: '101',
     month: 'November 2023',
     amount: 500,
     status: 'Pending',
     dueDate: '2023-11-05',
+  },
+  {
+    id: 'R-3',
+    studentName: 'Sarah Smith',
+    roomNumber: '204',
+    month: 'November 2023',
+    amount: 500,
+    status: 'Overdue',
+    dueDate: '2023-11-05',
+  },
+  {
+    id: 'R-4',
+    studentName: 'David Lee',
+    roomNumber: '305',
+    month: 'November 2023',
+    amount: 500,
+    status: 'Paid',
+    dueDate: '2023-11-05',
+    paidDate: '2023-11-04',
   }
 ];
 
