@@ -1,3 +1,28 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "lost-item-1",
+      "description": "Black laptop charger found in library",
+      "imageUrl": "https://picsum.photos/seed/lost1/400/300",
+      "imageHint": "laptop charger"
+    },
+    {
+      "id": "lost-item-2",
+      "description": "Blue water bottle left at gym",
+      "imageUrl": "https://picsum.photos/seed/lost2/400/300",
+      "imageHint": "water bottle"
+    },
+    {
+      "id": "lost-item-3",
+      "description": "Keys with a red keychain",
+      "imageUrl": "https://picsum.photos/seed/lost3/400/300",
+      "imageHint": "keychain keys"
+    },
+    {
+      "id": "admin-avatar",
+      "description": "Admin profile picture",
+      "imageUrl": "https://picsum.photos/seed/admin/100/100",
+      "imageHint": "professional person"
+    }
+  ]
 }
