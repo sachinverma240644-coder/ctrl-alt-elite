@@ -1,8 +1,8 @@
-
 'use server';
 
 import { adminTicketAutoPrioritization } from '@/ai/flows/admin-ticket-auto-prioritization';
 import { matchLostItems } from '@/ai/flows/lost-item-match';
+import { matchHostelsAI } from '@/ai/flows/hostel-match';
 import { store, Ticket, LostAndFoundItem, TicketStatus } from './store';
 import { revalidatePath } from 'next/cache';
 
@@ -86,4 +86,21 @@ export async function getAIMatches(itemId: string) {
   });
 
   return result.matches;
+}
+
+export async function findHostelMatches(requirements: string) {
+  const rooms = store.getHostelRooms();
+  const result = await matchHostelsAI({
+    requirements,
+    availableRooms: rooms.map(r => ({
+      id: r.id,
+      block: r.block,
+      roomNumber: r.roomNumber,
+      price: r.price,
+      size: r.size,
+      amenities: r.amenities,
+      description: r.description,
+    })),
+  });
+  return result.suggestions;
 }

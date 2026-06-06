@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { Navbar } from '@/components/layout/Navbar';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { store, RentPayment } from '@/app/lib/store';
-import { Search, DollarSign, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Search, DollarSign, Clock, CheckCircle2, AlertCircle, BarChart as BarChartIcon } from 'lucide-react';
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Cell } from 'recharts';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 
 export default function AdminRentTrackerPage() {
   const [payments, setPayments] = useState<RentPayment[]>([]);
@@ -28,44 +29,91 @@ export default function AdminRentTrackerPage() {
   const totalPending = payments.filter(p => p.status === 'Pending').reduce((acc, curr) => acc + curr.amount, 0);
   const totalOverdue = payments.filter(p => p.status === 'Overdue').reduce((acc, curr) => acc + curr.amount, 0);
 
+  // Chart Data preparation
+  const chartData = [
+    { name: 'Paid', value: totalCollected, color: 'hsl(var(--primary))' },
+    { name: 'Pending', value: totalPending, color: 'hsl(var(--accent))' },
+    { name: 'Overdue', value: totalOverdue, color: 'hsl(var(--destructive))' },
+  ];
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar role="admin" />
-      <main className="container mx-auto py-8 px-4 md:px-8">
+      <main className="container mx-auto py-8 px-4 md:px-8 mb-24">
         <header className="mb-8">
           <h1 className="text-3xl font-bold tracking-tight mb-2">Rent Tracker</h1>
-          <p className="text-muted-foreground text-lg">Financial overview and student payment statuses.</p>
+          <p className="text-muted-foreground text-lg">Financial overview and student payment analytics.</p>
         </header>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
-          <Card className="bg-emerald-500/5 border-emerald-500/20">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-emerald-500 flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4" /> Total Collected
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+          {/* Stats Cards */}
+          <div className="space-y-6">
+            <Card className="bg-emerald-500/5 border-emerald-500/20">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-emerald-500 flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4" /> Total Collected
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">${totalCollected.toLocaleString()}</div>
+              </CardContent>
+            </Card>
+            <Card className="bg-amber-500/5 border-amber-500/20">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-amber-500 flex items-center gap-2">
+                  <Clock className="h-4 w-4" /> Total Pending
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">${totalPending.toLocaleString()}</div>
+              </CardContent>
+            </Card>
+            <Card className="bg-rose-500/5 border-rose-500/20">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-rose-500 flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4" /> Total Overdue
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">${totalOverdue.toLocaleString()}</div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Bar Chart */}
+          <Card className="lg:col-span-2 glass-card">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChartIcon className="h-5 w-5" /> Payment Distribution
               </CardTitle>
+              <CardDescription>Visual breakdown of current hostel finances.</CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">${totalCollected.toLocaleString()}</div>
-            </CardContent>
-          </Card>
-          <Card className="bg-amber-500/5 border-amber-500/20">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-amber-500 flex items-center gap-2">
-                <Clock className="h-4 w-4" /> Total Pending
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">${totalPending.toLocaleString()}</div>
-            </CardContent>
-          </Card>
-          <Card className="bg-rose-500/5 border-rose-500/20">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-rose-500 flex items-center gap-2">
-                <AlertCircle className="h-4 w-4" /> Total Overdue
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">${totalOverdue.toLocaleString()}</div>
+            <CardContent className="h-[250px] pt-4">
+               <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={chartData}>
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} />
+                    <YAxis axisLine={false} tickLine={false} />
+                    <Tooltip 
+                      cursor={{fill: 'transparent'}}
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          return (
+                            <div className="bg-card border p-2 rounded-lg shadow-lg">
+                              <p className="text-sm font-bold">{payload[0].name}</p>
+                              <p className="text-sm text-primary">${payload[0].value}</p>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+                    <Bar dataKey="value" radius={[10, 10, 0, 0]}>
+                      {chartData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+               </ResponsiveContainer>
             </CardContent>
           </Card>
         </div>

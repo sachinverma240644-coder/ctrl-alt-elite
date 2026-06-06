@@ -21,7 +21,7 @@ export interface LostAndFoundItem {
   contact: string;
   imageUrl?: string;
   createdAt: string;
-  timestamp: string; // Detailed ISO timestamp for AI matching
+  timestamp: string;
 }
 
 export interface RentPayment {
@@ -33,6 +33,18 @@ export interface RentPayment {
   status: 'Paid' | 'Pending' | 'Overdue';
   dueDate: string;
   paidDate?: string;
+  marketRate: number; // For "Right Rent" indicator
+}
+
+export interface HostelRoom {
+  id: string;
+  block: string;
+  roomNumber: string;
+  price: number;
+  size: 'Single' | 'Double' | 'Triple';
+  amenities: string[];
+  description: string;
+  isAvailable: boolean;
 }
 
 let tickets: Ticket[] = [
@@ -68,39 +80,76 @@ let rentPayments: RentPayment[] = [
     id: 'R-1',
     studentName: 'Alex Johnson',
     roomNumber: '101',
-    month: 'October 2023',
+    month: 'Oct 2023',
     amount: 500,
     status: 'Paid',
     dueDate: '2023-10-05',
     paidDate: '2023-10-02',
+    marketRate: 500,
   },
   {
     id: 'R-2',
     studentName: 'Alex Johnson',
     roomNumber: '101',
-    month: 'November 2023',
-    amount: 500,
+    month: 'Nov 2023',
+    amount: 550,
     status: 'Pending',
     dueDate: '2023-11-05',
+    marketRate: 500,
   },
   {
     id: 'R-3',
     studentName: 'Sarah Smith',
     roomNumber: '204',
-    month: 'November 2023',
+    month: 'Nov 2023',
     amount: 500,
     status: 'Overdue',
     dueDate: '2023-11-05',
+    marketRate: 500,
   },
   {
     id: 'R-4',
     studentName: 'David Lee',
     roomNumber: '305',
-    month: 'November 2023',
-    amount: 500,
+    month: 'Nov 2023',
+    amount: 450,
     status: 'Paid',
     dueDate: '2023-11-05',
     paidDate: '2023-11-04',
+    marketRate: 500,
+  }
+];
+
+let hostelRooms: HostelRoom[] = [
+  {
+    id: 'HR-1',
+    block: 'Block A',
+    roomNumber: '101',
+    price: 500,
+    size: 'Single',
+    amenities: ['AC', 'Attached Bath', 'Balcony'],
+    description: 'Premium single room with park view and high-speed wifi.',
+    isAvailable: true,
+  },
+  {
+    id: 'HR-2',
+    block: 'Block B',
+    roomNumber: '205',
+    price: 350,
+    size: 'Double',
+    amenities: ['Fan', 'Shared Bath'],
+    description: 'Affordable double sharing near the student mess.',
+    isAvailable: true,
+  },
+  {
+    id: 'HR-3',
+    block: 'Block C',
+    roomNumber: '302',
+    price: 450,
+    size: 'Single',
+    amenities: ['AC', 'Gym Access'],
+    description: 'Modern room located right next to the campus gym.',
+    isAvailable: true,
   }
 ];
 
@@ -115,5 +164,6 @@ export const store = {
   getRentPayments: () => rentPayments,
   payRent: (id: string) => {
     rentPayments = rentPayments.map(r => r.id === id ? { ...r, status: 'Paid', paidDate: new Date().toISOString() } : r);
-  }
+  },
+  getHostelRooms: () => hostelRooms,
 };
