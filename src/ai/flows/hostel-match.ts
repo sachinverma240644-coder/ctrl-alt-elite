@@ -1,6 +1,10 @@
 'use server';
 /**
  * @fileOverview This flow matches student requirements with available hostel rooms.
+ *
+ * - matchHostelsAI - A function that handles the hostel matching process.
+ * - HostelMatchInput - The input type for the function.
+ * - HostelMatchOutput - The return type for the function.
  */
 
 import { ai } from '@/ai/genkit';
@@ -18,6 +22,7 @@ const HostelMatchInputSchema = z.object({
     description: z.string(),
   })),
 });
+export type HostelMatchInput = z.infer<typeof HostelMatchInputSchema>;
 
 const HostelMatchOutputSchema = z.object({
   suggestions: z.array(z.object({
@@ -26,16 +31,13 @@ const HostelMatchOutputSchema = z.object({
     reasoning: z.string().describe('Why this room is a good fit for the requirements'),
   })),
 });
-
-export type HostelMatchInput = z.infer<typeof HostelMatchInputSchema>;
 export type HostelMatchOutput = z.infer<typeof HostelMatchOutputSchema>;
 
-export async function matchHostelsAI(input: HostelMatchInput): Promise<HostelMatchOutput> {
-  const prompt = ai.definePrompt({
-    name: 'hostelMatchPrompt',
-    input: { schema: HostelMatchInputSchema },
-    output: { schema: HostelMatchOutputSchema },
-    prompt: `You are an AI Campus Concierge. Match the following student requirements with available hostel rooms.
+const hostelMatchPrompt = ai.definePrompt({
+  name: 'hostelMatchPrompt',
+  input: { schema: HostelMatchInputSchema },
+  output: { schema: HostelMatchOutputSchema },
+  prompt: `You are an AI Campus Concierge. Match the following student requirements with available hostel rooms.
 
 Student Requirements:
 {{{requirements}}}
@@ -46,8 +48,23 @@ Available Rooms:
 {{/each}}
 
 Analyze the requirements against the prices, amenities, and descriptions. Return the top 3 suggestions with detailed reasoning for each.`,
-  });
+});
 
-  const { output } = await prompt(input);
-  return output!;
+const hostelMatchFlow = ai.defineFlow(
+  {
+    name: 'hostelMatchFlow',
+    inputSchema: HostelMatchInputSchema,
+    outputSchema: HostelMatchOutputSchema,
+  },
+  async (input) => {
+    const { output } = await hostelMatchPrompt(input);
+    if (!output) {
+      throw new Error('Failed to match hostels.');
+    }
+    return output;
+  }
+);
+
+export async function matchHostelsAI(input: HostelMatchInput): Promise<HostelMatchOutput> {
+  return hostelMatchFlow(input);
 }
