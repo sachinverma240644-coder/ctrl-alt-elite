@@ -44,7 +44,7 @@ Student Requirements:
 
 Available Rooms:
 {{#each availableRooms}}
-- [ID: {{id}}] {{block}} Room {{roomNumber}}: {{size}} - ${{price}}. Features: {{#each amenities}}{{this}}, {{/each}}. {{description}}
+- [ID: {{id}}] {{block}} Room {{roomNumber}}: {{size}} - \${{price}}. Features: {{#each amenities}}{{this}}, {{/each}}. {{description}}
 {{/each}}
 
 Analyze the requirements against the prices, amenities, and descriptions. Return the top 3 suggestions with detailed reasoning for each.`,
