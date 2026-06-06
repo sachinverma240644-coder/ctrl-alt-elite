@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Building2, Home, PlusCircle, CreditCard, Box, User, Search } from 'lucide-react';
+import { Building2, Home, PlusCircle, CreditCard, Box, User, Search, LayoutGrid } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
@@ -19,7 +19,8 @@ export function Navbar({ role }: { role: 'student' | 'admin' }) {
 
   const adminLinks = [
     { name: 'Home', href: '/admin', icon: Home },
-    { name: 'Tickets', href: '/admin/tickets', icon: PlusCircle },
+    { name: 'Tickets', href: '/admin/tickets', icon: LayoutGrid },
+    { name: 'Post Room', href: '/admin/rooms/new', icon: PlusCircle },
     { name: 'Rent', href: '/admin/rent', icon: CreditCard },
   ];
 
@@ -27,7 +28,6 @@ export function Navbar({ role }: { role: 'student' | 'admin' }) {
 
   return (
     <>
-      {/* Top Brand Bar */}
       <div className="fixed top-0 left-0 right-0 h-16 bg-gradient-to-b from-background to-transparent z-40 pointer-events-none">
         <div className="container mx-auto h-full flex items-center justify-between px-6">
           <Link href="/" className="flex items-center space-x-2 pointer-events-auto">
@@ -40,7 +40,6 @@ export function Navbar({ role }: { role: 'student' | 'admin' }) {
         </div>
       </div>
 
-      {/* Unified Bottom Navigation */}
       <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center">
         <div className="flex h-16 liquid-glass rounded-full px-4 items-center gap-1 min-w-[340px] md:min-w-[600px] border border-white/20 shadow-2xl overflow-hidden">
           <div className="flex-1 flex items-center justify-around md:justify-center gap-2">

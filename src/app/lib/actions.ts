@@ -3,7 +3,9 @@
 import { adminTicketAutoPrioritization } from '@/ai/flows/admin-ticket-auto-prioritization';
 import { matchLostItems } from '@/ai/flows/lost-item-match';
 import { matchHostelsAI } from '@/ai/flows/hostel-match';
-import { store, Ticket, LostAndFoundItem, TicketStatus } from './store';
+import { suggestRoomPrice } from '@/ai/flows/suggest-room-price-flow';
+import { describeItemFromPhoto } from '@/ai/flows/describe-lost-item-flow';
+import { store, Ticket, LostAndFoundItem, TicketStatus, HostelRoom } from './store';
 import { revalidatePath } from 'next/cache';
 
 export async function createTicket(formData: FormData) {
@@ -32,10 +34,36 @@ export async function createTicket(formData: FormData) {
   return { success: true };
 }
 
-export async function updateStatus(ticketId: string, status: TicketStatus) {
-  store.updateTicketStatus(ticketId, status);
-  revalidatePath('/admin');
+export async function createHostelRoom(formData: FormData) {
+  const block = formData.get('block') as string;
+  const roomNumber = formData.get('roomNumber') as string;
+  const price = Number(formData.get('price'));
+  const size = formData.get('size') as any;
+  const description = formData.get('description') as string;
+  const amenities = (formData.get('amenities') as string).split(',').map(s => s.trim());
+
+  const newRoom: HostelRoom = {
+    id: `HR-${Math.floor(1000 + Math.random() * 9000)}`,
+    block,
+    roomNumber,
+    price,
+    size,
+    amenities,
+    description,
+    isAvailable: true,
+  };
+
+  store.addHostelRoom(newRoom);
+  revalidatePath('/student/find-hostel');
   return { success: true };
+}
+
+export async function getAiPriceSuggestion(description: string, size: any) {
+  return await suggestRoomPrice({ description, size });
+}
+
+export async function getAiItemDescription(photoDataUri: string) {
+  return await describeItemFromPhoto({ photoDataUri });
 }
 
 export async function reportLostFound(formData: FormData) {
@@ -44,6 +72,7 @@ export async function reportLostFound(formData: FormData) {
   const description = formData.get('description') as string;
   const location = formData.get('location') as string;
   const contact = formData.get('contact') as string;
+  const imageUrl = formData.get('imageUrl') as string;
 
   const newItem: LostAndFoundItem = {
     id: `LF-${Math.floor(100 + Math.random() * 900)}`,
@@ -52,7 +81,7 @@ export async function reportLostFound(formData: FormData) {
     description,
     location,
     contact,
-    imageUrl: `https://picsum.photos/seed/${Math.random()}/400/300`,
+    imageUrl: imageUrl || `https://picsum.photos/seed/${Math.random()}/400/300`,
     createdAt: new Date().toISOString(),
     timestamp: new Date().toISOString(),
   };
@@ -103,4 +132,10 @@ export async function findHostelMatches(requirements: string) {
     })),
   });
   return result.suggestions;
+}
+
+export async function updateStatus(ticketId: string, status: TicketStatus) {
+  store.updateTicketStatus(ticketId, status);
+  revalidatePath('/admin');
+  return { success: true };
 }

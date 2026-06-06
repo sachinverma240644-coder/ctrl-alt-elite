@@ -33,7 +33,7 @@ export interface RentPayment {
   status: 'Paid' | 'Pending' | 'Overdue';
   dueDate: string;
   paidDate?: string;
-  marketRate: number; // For "Right Rent" indicator
+  marketRate: number;
 }
 
 export interface HostelRoom {
@@ -166,4 +166,5 @@ export const store = {
     rentPayments = rentPayments.map(r => r.id === id ? { ...r, status: 'Paid', paidDate: new Date().toISOString() } : r);
   },
   getHostelRooms: () => hostelRooms,
+  addHostelRoom: (room: HostelRoom) => { hostelRooms = [room, ...hostelRooms]; },
 };
