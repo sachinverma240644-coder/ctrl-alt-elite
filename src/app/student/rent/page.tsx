@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Navbar } from '@/components/layout/Navbar';
@@ -9,6 +8,7 @@ import { store, RentPayment } from '@/app/lib/store';
 import { CreditCard, Calendar, CheckCircle2, AlertCircle, TrendingUp } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 
 export default function RentTrackingPage() {
   const [payments, setPayments] = useState<RentPayment[]>([]);
