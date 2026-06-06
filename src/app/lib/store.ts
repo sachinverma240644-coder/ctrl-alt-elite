@@ -22,11 +22,18 @@ export interface LostAndFoundItem {
   contact: string;
   imageUrl?: string;
   createdAt: string;
+  timestamp: string; // Detailed ISO timestamp for AI matching
 }
 
-// In a real app, this would be a database.
-// For MVP/Demo purposes, we use a global variable to persist across HMR in dev if possible,
-// or just simple initial data.
+export interface RentPayment {
+  id: string;
+  month: string;
+  amount: number;
+  status: 'Paid' | 'Pending' | 'Overdue';
+  dueDate: string;
+  paidDate?: string;
+}
+
 let tickets: Ticket[] = [
   {
     id: 'T-1001',
@@ -38,17 +45,6 @@ let tickets: Ticket[] = [
     priority: 'High',
     status: 'Pending',
     createdAt: new Date(Date.now() - 3600000).toISOString(),
-  },
-  {
-    id: 'T-1002',
-    title: 'WiFi Connection Issue',
-    description: 'WiFi is extremely slow since morning.',
-    hostelBlock: 'Block B',
-    roomNumber: '105',
-    category: 'Other',
-    priority: 'Medium',
-    status: 'In Progress',
-    createdAt: new Date(Date.now() - 7200000).toISOString(),
   }
 ];
 
@@ -62,6 +58,25 @@ let lostItems: LostAndFoundItem[] = [
     contact: 'Room 203',
     imageUrl: 'https://picsum.photos/seed/lost2/400/300',
     createdAt: new Date().toISOString(),
+    timestamp: new Date().toISOString(),
+  }
+];
+
+let rentPayments: RentPayment[] = [
+  {
+    id: 'R-1',
+    month: 'October 2023',
+    amount: 500,
+    status: 'Paid',
+    dueDate: '2023-10-05',
+    paidDate: '2023-10-02',
+  },
+  {
+    id: 'R-2',
+    month: 'November 2023',
+    amount: 500,
+    status: 'Pending',
+    dueDate: '2023-11-05',
   }
 ];
 
@@ -72,5 +87,9 @@ export const store = {
     tickets = tickets.map(t => t.id === id ? { ...t, status } : t);
   },
   getLostItems: () => lostItems,
-  addLostItem: (item: LostAndFoundItem) => { lostItems = [item, ...lostItems]; }
+  addLostItem: (item: LostAndFoundItem) => { lostItems = [item, ...lostItems]; },
+  getRentPayments: () => rentPayments,
+  payRent: (id: string) => {
+    rentPayments = rentPayments.map(r => r.id === id ? { ...r, status: 'Paid', paidDate: new Date().toISOString() } : r);
+  }
 };

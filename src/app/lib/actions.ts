@@ -2,6 +2,7 @@
 'use server';
 
 import { adminTicketAutoPrioritization } from '@/ai/flows/admin-ticket-auto-prioritization';
+import { matchLostItems } from '@/ai/flows/lost-item-match';
 import { store, Ticket, LostAndFoundItem, TicketStatus } from './store';
 import { revalidatePath } from 'next/cache';
 
@@ -11,7 +12,6 @@ export async function createTicket(formData: FormData) {
   const hostelBlock = formData.get('hostelBlock') as string;
   const roomNumber = formData.get('roomNumber') as string;
 
-  // Use AI to triage the ticket
   const aiResult = await adminTicketAutoPrioritization({ description });
 
   const newTicket: Ticket = {
@@ -54,9 +54,36 @@ export async function reportLostFound(formData: FormData) {
     contact,
     imageUrl: `https://picsum.photos/seed/${Math.random()}/400/300`,
     createdAt: new Date().toISOString(),
+    timestamp: new Date().toISOString(),
   };
 
   store.addLostItem(newItem);
   revalidatePath('/student/lost-and-found');
   return { success: true };
+}
+
+export async function getAIMatches(itemId: string) {
+  const items = store.getLostItems();
+  const target = items.find(i => i.id === itemId);
+  if (!target) return [];
+
+  const others = items.filter(i => i.type !== target.type);
+  const result = await matchLostItems({
+    reportedItem: {
+      title: target.title,
+      description: target.description,
+      location: target.location,
+      timestamp: target.timestamp,
+      type: target.type,
+    },
+    potentialMatches: others.map(i => ({
+      id: i.id,
+      title: i.title,
+      description: i.description,
+      location: i.location,
+      timestamp: i.timestamp,
+    })),
+  });
+
+  return result.matches;
 }
