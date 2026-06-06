@@ -26,57 +26,63 @@ export function Navbar({ role }: { role: 'student' | 'admin' }) {
 
   return (
     <>
-      {/* Top Brand Bar */}
-      <div className="fixed top-0 left-0 right-0 h-16 liquid-glass z-50 flex items-center px-6 justify-between md:hidden">
-        <Link href="/" className="flex items-center space-x-2">
-          <Building2 className="h-6 w-6 text-primary" />
-          <span className="font-bold text-xl text-primary tracking-tight">CampusOS.AI</span>
-        </Link>
-        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center border border-white/10">
-          <User className="h-4 w-4 text-primary" />
+      {/* Top Brand Bar (Desktop & Mobile) - Kept subtle at top */}
+      <div className="fixed top-0 left-0 right-0 h-16 bg-gradient-to-b from-background to-transparent z-40 pointer-events-none">
+        <div className="container mx-auto h-full flex items-center justify-between px-6">
+          <Link href="/" className="flex items-center space-x-2 pointer-events-auto">
+            <Building2 className="h-6 w-6 text-primary" />
+            <span className="font-bold text-xl text-primary tracking-tight">CampusOS.AI</span>
+          </Link>
+          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center border border-white/10 pointer-events-auto">
+            <User className="h-5 w-5 text-primary" />
+          </div>
         </div>
       </div>
 
-      {/* Desktop Sidebar / Top Nav (Fallback or Modern floating) */}
-      <nav className="hidden md:flex fixed top-4 left-1/2 -translate-x-1/2 h-16 liquid-glass rounded-full px-6 items-center gap-2 z-50 min-w-[500px]">
-        <Link href="/" className="mr-6 flex items-center space-x-2">
-          <Building2 className="h-6 w-6 text-primary" />
-          <span className="font-bold text-lg text-primary">CampusOS.AI</span>
-        </Link>
-        <div className="flex-1 flex items-center justify-center gap-1">
+      {/* Unified Bottom Navigation (Desktop & Mobile) */}
+      <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center">
+        {/* Desktop View */}
+        <div className="hidden md:flex h-16 liquid-glass rounded-full px-4 items-center gap-1 min-w-[500px] border border-white/20 shadow-2xl">
+          <div className="flex-1 flex items-center justify-center gap-2">
+            {links.map((link) => (
+              <Link key={link.href} href={link.href}>
+                <Button
+                  variant="ghost"
+                  className={cn(
+                    "rounded-full px-6 h-11 transition-all duration-300 relative group",
+                    pathname === link.href 
+                      ? "bg-primary text-primary-foreground shadow-[0_0_20px_rgba(var(--primary),0.3)]" 
+                      : "text-muted-foreground hover:bg-white/10 hover:text-white"
+                  )}
+                >
+                  <link.icon className={cn("mr-2 h-4 w-4", pathname === link.href ? "animate-pulse" : "")} />
+                  <span className="font-semibold">{link.name}</span>
+                  {pathname === link.href && (
+                    <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-white rounded-full" />
+                  )}
+                </Button>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {/* Mobile View */}
+        <div className="flex md:hidden h-16 liquid-glass rounded-2xl items-center justify-around px-4 min-w-[320px] border border-white/20 shadow-2xl">
           {links.map((link) => (
-            <Link key={link.href} href={link.href}>
-              <Button
-                variant="ghost"
-                className={cn(
-                  "rounded-full px-4 h-10 transition-all",
-                  pathname === link.href ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-white/10"
+            <Link key={link.href} href={link.href} className="relative group">
+              <div className={cn(
+                "flex flex-col items-center gap-1 transition-all duration-300 px-4 py-2 rounded-xl",
+                pathname === link.href ? "text-primary scale-110" : "text-muted-foreground hover:text-white"
+              )}>
+                <link.icon className="h-6 w-6" />
+                <span className="text-[10px] font-bold uppercase tracking-tighter">{link.name}</span>
+                {pathname === link.href && (
+                  <div className="absolute -bottom-0 w-1.5 h-1.5 bg-primary rounded-full blur-[1px]" />
                 )}
-              >
-                <link.icon className="mr-2 h-4 w-4" />
-                {link.name}
-              </Button>
+              </div>
             </Link>
           ))}
         </div>
-      </nav>
-
-      {/* Mobile Bottom Tab Bar */}
-      <nav className="fixed bottom-6 left-6 right-6 h-16 liquid-glass rounded-2xl flex items-center justify-around px-2 z-50 md:hidden">
-        {links.map((link) => (
-          <Link key={link.href} href={link.href} className="relative group">
-            <div className={cn(
-              "flex flex-col items-center gap-1 transition-all duration-300 px-3 py-1 rounded-xl",
-              pathname === link.href ? "text-primary scale-110" : "text-muted-foreground hover:text-white"
-            )}>
-              <link.icon className="h-6 w-6" />
-              <span className="text-[10px] font-medium">{link.name}</span>
-              {pathname === link.href && (
-                <div className="absolute -bottom-1 w-1 h-1 bg-primary rounded-full" />
-              )}
-            </div>
-          </Link>
-        ))}
       </nav>
     </>
   );
